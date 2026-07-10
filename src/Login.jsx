@@ -11,11 +11,11 @@ function Login() {
   function handleLogin(e) {
     e.preventDefault();
 
-    const registeredUser = JSON.parse(
+    const savedUser = JSON.parse(
       localStorage.getItem("registeredUser")
     );
 
-    if (!registeredUser) {
+    if (!savedUser) {
       alert("Please signup first");
       navigate("/signup");
       return;
@@ -23,47 +23,24 @@ function Login() {
 
     const emailMatches =
       email.trim().toLowerCase() ===
-      registeredUser.email?.trim().toLowerCase();
+      savedUser.email?.trim().toLowerCase();
 
     const passwordMatches =
-      password === registeredUser.password;
+      password === savedUser.password;
 
     if (!emailMatches || !passwordMatches) {
       alert("Invalid email or password");
       return;
     }
 
-    const existingFoodUser = JSON.parse(
-      localStorage.getItem("foodUser")
-    );
-
-    const loggedInUser = {
-      ...registeredUser,
-
-      // Keep previously edited profile details
-      name:
-        existingFoodUser?.email === registeredUser.email
-          ? existingFoodUser.name || registeredUser.name
-          : registeredUser.name,
-
-      phone:
-        existingFoodUser?.email === registeredUser.email
-          ? existingFoodUser.phone || registeredUser.phone || ""
-          : registeredUser.phone || "",
-
-      address:
-        existingFoodUser?.email === registeredUser.email
-          ? existingFoodUser.address || registeredUser.address || ""
-          : registeredUser.address || "",
-    };
-
     localStorage.setItem(
       "foodUser",
-      JSON.stringify(loggedInUser)
+      JSON.stringify(savedUser)
     );
 
-    navigate("/menu");
-    window.location.reload();
+    alert("Login successful!");
+
+    navigate("/menu", { replace: true });
   }
 
   return (
@@ -91,7 +68,8 @@ function Login() {
         <button type="submit">Login</button>
 
         <p>
-          New user? <Link to="/signup">Signup here</Link>
+          New user?{" "}
+          <Link to="/signup">Signup here</Link>
         </p>
       </form>
     </div>
