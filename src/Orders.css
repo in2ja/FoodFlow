@@ -1,0 +1,27 @@
+.orders-page{
+    padding:40px;
+    background:#fff8f4;
+    min-height:90vh;
+}
+
+.orders-page h1{
+    color:#fb5203;
+    margin-bottom:25px;
+}
+
+.order-card{
+    background:white;
+    padding:25px;
+    margin-bottom:20px;
+    border-radius:15px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.order-card p{
+    margin:8px 0;
+}
+
+.order-card ul{
+    margin-top:15px;
+    padding-left:20px;
+}
