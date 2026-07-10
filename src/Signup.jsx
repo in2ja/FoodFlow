@@ -13,9 +13,6 @@ function Signup() {
     address: "",
   });
 
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
-
   function handleChange(e) {
     setUser({
       ...user,
@@ -26,50 +23,48 @@ function Signup() {
   function handleSignup(e) {
     e.preventDefault();
 
-    if (user.password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    if (user.password.length < 6) {
-      alert(
-        "Password must contain at least 6 characters"
-      );
-      return;
-    }
-
-    const formattedUser = {
-      ...user,
+    const newUser = {
       name: user.name.trim(),
       email: user.email.trim().toLowerCase(),
+      password: user.password,
       phone: user.phone.trim(),
       address: user.address.trim(),
     };
 
+    if (
+      !newUser.name ||
+      !newUser.email ||
+      !newUser.password ||
+      !newUser.phone ||
+      !newUser.address
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+
     localStorage.setItem(
       "registeredUser",
-      JSON.stringify(formattedUser)
+      JSON.stringify(newUser)
     );
+
+    // Do not log the user in automatically after signup
+    localStorage.removeItem("foodUser");
 
     alert("Signup successful! Please login.");
 
-    navigate("/login");
+    navigate("/login", { replace: true });
   }
 
   return (
     <div className="auth-page">
-      <form
-        className="auth-box"
-        onSubmit={handleSignup}
-      >
-        <h2>Signup</h2>
-
+      <form className="auth-box" onSubmit={handleSignup}>
+        <h2>Sign Up</h2>
         <p>Create your Food Flow account</p>
 
         <input
           type="text"
           name="name"
-          placeholder="Full name"
+          placeholder="Full Name"
           value={user.name}
           onChange={handleChange}
           required
@@ -85,23 +80,6 @@ function Signup() {
         />
 
         <input
-          type="tel"
-          name="phone"
-          placeholder="Phone number"
-          value={user.phone}
-          onChange={handleChange}
-          required
-        />
-
-        <textarea
-          name="address"
-          placeholder="Delivery address"
-          value={user.address}
-          onChange={handleChange}
-          required
-        />
-
-        <input
           type="password"
           name="password"
           placeholder="Password"
@@ -111,24 +89,27 @@ function Signup() {
         />
 
         <input
-          type="password"
-          placeholder="Confirm password"
-          value={confirmPassword}
-          onChange={(e) =>
-            setConfirmPassword(e.target.value)
-          }
+          type="text"
+          name="phone"
+          placeholder="Phone Number"
+          value={user.phone}
+          onChange={handleChange}
           required
         />
 
-        <button type="submit">
-          Signup
-        </button>
+        <textarea
+          name="address"
+          placeholder="Delivery Address"
+          value={user.address}
+          onChange={handleChange}
+          required
+        ></textarea>
+
+        <button type="submit">Create Account</button>
 
         <p>
-          Already have an account?{" "}
-          <Link to="/login">
-            Login here
-          </Link>
+          Already registered?{" "}
+          <Link to="/login">Login here</Link>
         </p>
       </form>
     </div>
