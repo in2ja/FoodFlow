@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ScrollToTop from "./ScrollToTop";
 
 import Home from "./Home";
 import Login from "./Login";
@@ -41,15 +42,11 @@ function App() {
 
   // Add item to cart
   function addToCart(product) {
-    const user = JSON.parse(
-      localStorage.getItem("foodUser")
-    );
+    const user = JSON.parse(localStorage.getItem("foodUser"));
 
     if (!user) {
       alert("Please login first to add items to cart");
-
       navigate("/login");
-
       return;
     }
 
@@ -61,10 +58,7 @@ function App() {
       if (existingItem) {
         return currentCart.map((item) =>
           item.id === product.id
-            ? {
-                ...item,
-                qty: item.qty + 1,
-              }
+            ? { ...item, qty: item.qty + 1 }
             : item
         );
       }
@@ -81,50 +75,44 @@ function App() {
     alert("Item added to cart!");
   }
 
-  // Increase quantity
+  // Increase Quantity
   function increaseQty(id) {
     setCart((currentCart) =>
       currentCart.map((item) =>
         item.id === id
-          ? {
-              ...item,
-              qty: item.qty + 1,
-            }
+          ? { ...item, qty: item.qty + 1 }
           : item
       )
     );
   }
 
-  // Decrease quantity
+  // Decrease Quantity
   function decreaseQty(id) {
     setCart((currentCart) =>
       currentCart
         .map((item) =>
           item.id === id
-            ? {
-                ...item,
-                qty: item.qty - 1,
-              }
+            ? { ...item, qty: item.qty - 1 }
             : item
         )
         .filter((item) => item.qty > 0)
     );
   }
 
-  // Remove item completely
+  // Remove Item
   function removeItem(id) {
     setCart((currentCart) =>
       currentCart.filter((item) => item.id !== id)
     );
   }
 
-  // Clear entire cart
+  // Clear Cart
   function clearCart() {
     setCart([]);
     localStorage.removeItem("cart");
   }
 
-  // Number of all item quantities
+  // Total Cart Count
   const cartCount = cart.reduce(
     (total, item) => total + item.qty,
     0
@@ -132,48 +120,36 @@ function App() {
 
   return (
     <>
+      {/* Scroll to top on every page */}
+      <ScrollToTop />
+
+      {/* Navbar */}
       <Navbar cartCount={cartCount} />
 
       <Routes>
+
         {/* Home */}
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/" element={<Home />} />
 
-        {/* Authentication */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        {/* Login & Signup */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-        <Route
-          path="/signup"
-          element={<Signup />}
-        />
-
-        {/* Restaurant list */}
+        {/* Menu */}
         <Route
           path="/menu"
-          element={
-            <Menu addToCart={addToCart} />
-          }
+          element={<Menu addToCart={addToCart} />}
         />
 
-        {/* Category menu */}
         <Route
           path="/menu/:type"
-          element={
-            <Menu addToCart={addToCart} />
-          }
+          element={<Menu addToCart={addToCart} />}
         />
 
-        {/* Individual restaurant */}
+        {/* Restaurant */}
         <Route
           path="/restaurant/:id"
-          element={
-            <Restaurant addToCart={addToCart} />
-          }
+          element={<Restaurant addToCart={addToCart} />}
         />
 
         {/* Cart */}
@@ -192,18 +168,16 @@ function App() {
         {/* Checkout */}
         <Route
           path="/checkout"
-          element={
-            <Checkout clearCart={clearCart} />
-          }
+          element={<Checkout clearCart={clearCart} />}
         />
 
-        {/* Track current order */}
+        {/* Live Tracking */}
         <Route
           path="/track"
           element={<TrackOrder />}
         />
 
-        {/* Previous orders */}
+        {/* Orders */}
         <Route
           path="/orders"
           element={<OrderHistory />}
@@ -239,13 +213,15 @@ function App() {
           element={<Help />}
         />
 
-        {/* Unknown route */}
+        {/* 404 */}
         <Route
           path="*"
           element={<Home />}
         />
+
       </Routes>
 
+      {/* Footer */}
       <Footer />
     </>
   );
