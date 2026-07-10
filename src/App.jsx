@@ -1,4 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
+
 import { useEffect, useState } from "react";
 
 import Navbar from "./Navbar";
@@ -20,103 +25,155 @@ import Restaurant from "./Restaurant";
 import Help from "./Help";
 
 function App() {
-  const [cart, setCart] = useState(
-    JSON.parse(localStorage.getItem("cart")) || []
-  );
+  const navigate = useNavigate();
+
+  const [cart, setCart] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("cart")) || [];
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Add To Cart
+  // Add item to cart
   function addToCart(product) {
-    const user = JSON.parse(localStorage.getItem("foodUser"));
+    const user = JSON.parse(
+      localStorage.getItem("foodUser")
+    );
 
     if (!user) {
       alert("Please login first to add items to cart");
-      window.location.href = "/login";
+
+      navigate("/login");
+
       return;
     }
 
-    const exists = cart.find((item) => item.id === product.id);
-
-    if (exists) {
-      setCart(
-        cart.map((item) =>
-          item.id === product.id
-            ? { ...item, qty: item.qty + 1 }
-            : item
-        )
+    setCart((currentCart) => {
+      const existingItem = currentCart.find(
+        (item) => item.id === product.id
       );
-    } else {
-      setCart([...cart, { ...product, qty: 1 }]);
-    }
+
+      if (existingItem) {
+        return currentCart.map((item) =>
+          item.id === product.id
+            ? {
+                ...item,
+                qty: item.qty + 1,
+              }
+            : item
+        );
+      }
+
+      return [
+        ...currentCart,
+        {
+          ...product,
+          qty: 1,
+        },
+      ];
+    });
 
     alert("Item added to cart!");
   }
 
-  // Increase Quantity
+  // Increase quantity
   function increaseQty(id) {
-    setCart(
-      cart.map((item) =>
+    setCart((currentCart) =>
+      currentCart.map((item) =>
         item.id === id
-          ? { ...item, qty: item.qty + 1 }
+          ? {
+              ...item,
+              qty: item.qty + 1,
+            }
           : item
       )
     );
   }
 
-  // Decrease Quantity
+  // Decrease quantity
   function decreaseQty(id) {
-    setCart(
-      cart
+    setCart((currentCart) =>
+      currentCart
         .map((item) =>
           item.id === id
-            ? { ...item, qty: item.qty - 1 }
+            ? {
+                ...item,
+                qty: item.qty - 1,
+              }
             : item
         )
         .filter((item) => item.qty > 0)
     );
   }
 
-  // Remove Item Completely
+  // Remove item completely
   function removeItem(id) {
-    setCart(cart.filter((item) => item.id !== id));
+    setCart((currentCart) =>
+      currentCart.filter((item) => item.id !== id)
+    );
   }
 
-  // Clear Cart
+  // Clear entire cart
   function clearCart() {
     setCart([]);
     localStorage.removeItem("cart");
   }
 
+  // Number of all item quantities
+  const cartCount = cart.reduce(
+    (total, item) => total + item.qty,
+    0
+  );
+
   return (
     <>
-      <Navbar cartCount={cart.length} />
+      <Navbar cartCount={cartCount} />
 
       <Routes>
         {/* Home */}
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-        {/* Login & Signup */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* Authentication */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        {/* Menu */}
+        <Route
+          path="/signup"
+          element={<Signup />}
+        />
+
+        {/* Restaurant list */}
         <Route
           path="/menu"
-          element={<Menu addToCart={addToCart} />}
+          element={
+            <Menu addToCart={addToCart} />
+          }
         />
 
+        {/* Category menu */}
         <Route
           path="/menu/:type"
-          element={<Menu addToCart={addToCart} />}
+          element={
+            <Menu addToCart={addToCart} />
+          }
         />
 
-        {/* Restaurant */}
+        {/* Individual restaurant */}
         <Route
           path="/restaurant/:id"
-          element={<Restaurant addToCart={addToCart} />}
+          element={
+            <Restaurant addToCart={addToCart} />
+          }
         />
 
         {/* Cart */}
@@ -135,16 +192,18 @@ function App() {
         {/* Checkout */}
         <Route
           path="/checkout"
-          element={<Checkout clearCart={clearCart} />}
+          element={
+            <Checkout clearCart={clearCart} />
+          }
         />
 
-        {/* Track */}
+        {/* Track current order */}
         <Route
           path="/track"
           element={<TrackOrder />}
         />
 
-        {/* Orders */}
+        {/* Previous orders */}
         <Route
           path="/orders"
           element={<OrderHistory />}
@@ -178,6 +237,12 @@ function App() {
         <Route
           path="/help"
           element={<Help />}
+        />
+
+        {/* Unknown route */}
+        <Route
+          path="*"
+          element={<Home />}
         />
       </Routes>
 
